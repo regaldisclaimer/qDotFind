@@ -3,11 +3,15 @@ Quantum dot reaction event analysis software
 
 Written for Walt Lab, Tufts U
 
-Copyright (c) August 2015
+August 2015
+
+Copyright (c) 
 
 Author Contact: regaldisclaimer@gmail.com
 
 ##Dependencies
+
+-locMax.m
 
 -pkfind.m by Eric R. Dufresne (Yale University)
 
@@ -32,11 +36,11 @@ Author Contact: regaldisclaimer@gmail.com
 qDotFind currently accepts 5 different as you can see:
 
 ````Matlab
-function void = qdf(bgMethod, qFindMethod, dotSize, addContrast, debugMode);
+function void = qdf(bgMethod, qFindMethod, dotRadius, addContrast, debugMode);
 ````
 
 To run the program, type `qdf()` in the command line with appropriate option arguments.
-For example, to set `bgMethod = 0`, `qFindMethod = 1`, `dotSize = 0`, `addContrast = 0`, `debugMode = 1`
+For example, to set `bgMethod = 0`, `qFindMethod = 1`, `dotRadius = 0`, `addContrast = 0`, `debugMode = 1`
 
 You will run the following in the command line:
 

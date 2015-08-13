@@ -10,6 +10,7 @@ Author Contact: regaldisclaimer@gmail.com
 ##Dependencies
 
 -pkfind.m by Eric R. Dufresne (Yale University)
+
 -tiffread2.m by Francois Nedelec (nedelec@embl.de)
 
 ##How to use
@@ -31,11 +32,11 @@ Author Contact: regaldisclaimer@gmail.com
 qDotFind currently accepts 5 different as you can see:
 
 ````Matlab
-function void = qdf(bgMethod, qFindMethod, dotSize, contrast, debugMode);
+function void = qdf(bgMethod, qFindMethod, dotSize, addContrast, debugMode);
 ````
 
 To run the program, type `qdf()` in the command line with appropriate option arguments.
-For example, to set `bgMethod = 0`, `qFindMethod = 1`, `dotSize = 0`, `contrast = 0`, `debugMode = 1`
+For example, to set `bgMethod = 0`, `qFindMethod = 1`, `dotSize = 0`, `addContrast = 0`, `debugMode = 1`
 
 You will run the following in the command line:
 

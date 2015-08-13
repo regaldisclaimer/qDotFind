@@ -32,7 +32,7 @@
 %%%%%	%%%%%	Section 0: Options 								%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function void = qdf(bgMethod, qFindMethod, dotSize, contrast, debugMode)
+function void = qdf(bgMethod, qFindMethod, dotSize, addContrast, debugMode)
 
 % check to make sure all arguments are passed in for safety.
 if(nargin>5)

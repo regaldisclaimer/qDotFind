@@ -44,7 +44,7 @@
 %%%%%	%%%%%	Section 0: Options 								%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function void = qdf(bgMethod, qFindMethod, dotSize, addContrast, debugMode)
+function void = qdf(bgMethod, qFindMethod, dotSize,clump, addContrast, debugMode)
 
 % check to make sure all arguments are passed in for safety.
 if(nargin>5)
@@ -58,15 +58,18 @@ end
 
 % qFindMethod: Method for finding qDots
 %
-% 0:	default.  
-% 1:	legacy. uses pkfind.m
+% 0:	default. slower. iterates through every single frame for accuracy
+% 1:	legacy. faster. uses highest aggregate intensity
 
 
 % dotSize: expected dotsize. regions larger than this will be considered as clumps.
 % 	Set slightly larger than suspected diameter
 %
+
+% clump: whether clumps are completely ignored, or treated as one qdot.
+%
 % 0:	default. ignore all points in clumps
-% 1:	legacy. keeps brightest pixel in clumps
+% 1:	legacy. keep brightest pixel in clumps
 
 % debugMode: turn debug comments on or off
 % 
@@ -81,14 +84,15 @@ end
 %%%%%	%%%%%	Section 1: Describe Important Variables 		%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%imageHeight:		height of the image
-%imageWidth:		width of the image
+% fileHeight:		height of the image
+% fileWidth:		width of the image
 
-%numStack:			number of images on the stack
-%firstFrame:		number of frame on which analysis should start
+% numStack:			number of images on the stack
+% firstFrame:		number of frame on which analysis should start
+firstFrame = 1;
 
-%background:		intensity value below which the pixel is considered background
-%eventThreshold:	intensity value below which qdot is considered to be off
+% background:		intensity value below which the pixel is considered background
+% eventThreshold:	intensity value below which qdot is considered to be off
 
 
 
@@ -120,7 +124,7 @@ end
 [tiffReadStack, numStack] = tiffread2([filePath, fileName]);
 
 
-%set image dimensions
+% set image dimensions
 fileWidth = tiffReadStack(1).width;
 fileHeight = tiffReadStack(1).height;
 
@@ -150,7 +154,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%default method
+%%%
+%%% default method
+%%%
 if (bgMethod == 0)
 
 	%hist(**, 100);
@@ -166,7 +172,10 @@ if (bgMethod == 0)
 
 end
 
-%conservative method
+
+%%%
+%%% conservative method
+%%%
 if (bgMethod ==1)
 
 	%hist(**, 100);
@@ -193,16 +202,67 @@ end
 
 
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%	%%%%%	Section 5: Determine Background 				%%%%%	%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%	%%%%%	Section 6: Locate Quantum Dots 					%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% default: slow & accurate method
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if (qFindMethod == 0)
+
+
+
+
+
+
+
+end
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%% fast & clumsy method
+%%%%%%%%%%%%%%%%%%%%%%%%
+if (qFindMethod == 1)
+
+
+	%%%
+	%%%create aggregate maximum intensity profile
+	%%%
+	maxProfile = zero(fileWidth, fileHeight);
+
+	%for each layer in stack
+	for i = firstFrame:numStack
+		thisLayer = double(tiffReadStack(i).data);
+		%for each pixel
+		for j = fileWidth
+			for k = fileHeight
+				%store the higher value
+				if (thisLayer(j,k)>maxProfile(j,k))
+					maxProfile(j,k) = thisLayer(j,k);
+				end
+			end
+		end
+	end
+
+
+	%%%
+	%%% Find local maxima
+	%%%
+
+	if (clump == 0)
+		%%use locMax here
+	end
+
+	if (clump == 1)
+		qDots = pkfind(maxProfile, background, dotSize);
+	end
+
+end
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%	%%%%%	Section 7: Plot Distribution 					%%%%%	%%%%%

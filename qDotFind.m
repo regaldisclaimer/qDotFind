@@ -48,7 +48,7 @@ function void = qdf(bgMethod, qFindMethod, dotSize,clump, addContrast, debugMode
 
 % check to make sure all arguments are passed in for safety.
 if(nargin>5)
- fprintf(1, 'WARNING: MISSING ARGUMENT(S). DEFAULT VALUES USED');
+	error('WARNING: MISSING ARGUMENT(S). PROGRAM EXITING')
 end
 
 % bgMethod: Algorithm code for how the background is determined
@@ -155,48 +155,90 @@ end
 
 
 %%%
-%%% default method
+%%% default method (background only)
 %%%
 if (bgMethod == 0)
 
-	%hist(**, 100);
+	firstFrameData = tiffReadStack(firstFrame).data;
 
-	%response = 'N';
+	%plot first frame intensity
+	hist(firstFrameData, 100);
+
+	response = 'N';
 
 	%repeat until good value for background is found
-	%while response != 'Y'||'y'||'yes'
-	%	background = input('Enter a guess for the baseline');
-	%	plot dots
-	%	response = input('Are you happy with the baseline? [Y/N]');
-	%end
+	while ~((response == 'Y')| (response == 'y'))
+		background = input('Enter a guess for the baseline');
+		%plot dots
+
+		imshow(firstFrameData);
+
+		for (i = 1:fileWidth)
+			for (j = 1:fileHeight)
+				if (firstFrameData(i,j) >= background)
+					rectangle('Position',[i, j, 1, 1],...
+							  'LineStyle', '--',...
+							  'LineWidth', 0.1,...
+							  'EdgeColor', 'r');
+				end
+			end
+		end
+
+		response = input('Are you happy with the baseline? [Y/N]');
+	end
 
 end
 
 
 %%%
-%%% conservative method
+%%% conservative method (background and cutoff)
 %%%
 if (bgMethod ==1)
 
-	%hist(**, 100);
+	%plot first frame intensity
+	hist(tiffReadStack(firstFrame).data, 100);
 
-	%response = 'N';
+	response = 'N';
 
 	%repeat until good value for background is found
-	%while response != 'Y'||'y'||'yes'
-	%	background = input('Enter a guess for the baseline', 's');
-	%	plot dots
-	%	response = input('Are you happy with the baseline? [Y/N]', 's');
-	%end
+	while ~((response == 'Y')| (response == 'y'))
+		background = input('Enter a guess for the baseline', 's');
+		%plot dots
+
+		for (i = 1:fileWidth)
+			for (j = 1:fileHeight)
+				if (firstFrameData(i,j) >= background)
+					rectangle('Position',[i, j, 1, 1],...
+							  'LineStyle', '--',...
+							  'LineWidth', 0.1,...
+							  'EdgeColor', 'r');
+				end
+			end
+		end
+
+		response = input('Are you happy with the baseline? [Y/N]', 's');
+	end
 
 
-	%response = 'N';
+	response = 'N';
 	%repeat until good cutoff is found
-	%while response != 'Y'||'y'||'yes'
-	%	cutoff = input('Enter a guess for the cutoff', 's');
-	%	plot dots
-	%	response = input('Are you happy with the cutoff? [Y/N]', 's');
-	%end
+	while ~((response == 'Y')| (response == 'y'))
+		cutoff = input('Enter a guess for the cutoff', 's');
+		%plot dots
+		
+		for (i = 1:fileWidth)
+			for (j = 1:fileHeight)
+				if (firstFrameData(i,j) >= background)
+					rectangle('Position',[i, j, 1, 1],...
+							  'LineStyle', '--',...
+							  'LineWidth', 0.1,...
+							  'EdgeColor', 'r');
+				end
+			end
+		end
+		
+		response = input('Are you happy with the cutoff? [Y/N]', 's');
+	end
 
 end
 

@@ -173,8 +173,8 @@ if (bgMethod == 0)
 
 		imshow(firstFrameData);
 
-		for (i = 1:fileWidth)
-			for (j = 1:fileHeight)
+		for (i = 1:fileHeight)
+			for (j = 1:fileWidth)
 				if (firstFrameData(i,j) >= background)
 					rectangle('Position',[i, j, 1, 1],...
 							  'LineStyle', '--',...
@@ -207,8 +207,8 @@ if (bgMethod ==1)
 		background = input('Enter a guess for the baseline', 's');
 		%plot dots
 
-		for (i = 1:fileWidth)
-			for (j = 1:fileHeight)
+		for (i = 1:fileHeight)
+			for (j = 1:fileWidth)
 				if (firstFrameData(i,j) >= background)
 					rectangle('Position',[i, j, 1, 1],...
 							  'LineStyle', '--',...
@@ -229,8 +229,8 @@ if (bgMethod ==1)
 		cutoff = input('Enter a guess for the cutoff', 's');
 		%plot dots
 		
-		for (i = 1:fileWidth)
-			for (j = 1:fileHeight)
+		for (i = 1:fileHeight)
+			for (j = 1:fileWidth)
 				if (firstFrameData(i,j) >= background)
 					rectangle('Position',[i, j, 1, 1],...
 							  'LineStyle', '--',...
@@ -278,14 +278,14 @@ if (qFindMethod == 1)
 	%%%
 	%%%create aggregate maximum intensity profile
 	%%%
-	maxProfile = zero(fileWidth, fileHeight);
+	maxProfile = zero(fileHeight, fileWidth);
 
 	%for each layer in stack
 	for i = firstFrame:numStack
 		thisLayer = double(tiffReadStack(i).data);
 		%for each pixel
-		for j = fileWidth
-			for k = fileHeight
+		for j = fileHeight
+			for k = fileWidth
 				%store the higher value
 				if (thisLayer(j,k)>maxProfile(j,k))
 					maxProfile(j,k) = thisLayer(j,k);

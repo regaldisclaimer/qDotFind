@@ -39,12 +39,18 @@
 %%
 %%
 %%
-%%	Based on pkfnd.m
+%%	Based on pkfnd.m by Eric R. Dufresne, Yale University
 %%
-
-
-
-
+%%
+%%
+%%
+%%
+%%
 function outPut = locMax(image, threshold, size, clump);
-%Local Maxima locator
-%
+
+
+
+
+%Input:
+	%image: source image for maxima location
+	%threshold: 

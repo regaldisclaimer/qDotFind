@@ -13,8 +13,6 @@ Author Contact: regaldisclaimer@gmail.com
 
 -locMax.m
 
--pkfind.m by Eric R. Dufresne (Yale University)
-
 -tiffread2.m by Francois Nedelec (nedelec@embl.de)
 
 ##How to use

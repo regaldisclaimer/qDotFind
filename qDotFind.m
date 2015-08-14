@@ -25,7 +25,7 @@
 %%
 %%
 %%	Utilizes:
-%%		pkfind.m by Eric R. Dufresne (Yale University)
+%%		pkfnd.m by Eric R. Dufresne (Yale University)
 %%		tiffread2.m by Francois Nedelec (nedelec@embl.de)
 %%
 %%
@@ -187,6 +187,8 @@ if (bgMethod == 0)
 		response = input('Are you happy with the baseline? [Y/N]');
 	end
 
+	fprintf(1,'Great. Background set @ '+background);
+
 end
 
 
@@ -219,6 +221,7 @@ if (bgMethod ==1)
 		response = input('Are you happy with the baseline? [Y/N]', 's');
 	end
 
+	fprintf(1,'Great. Background set @ '+background);
 
 	response = 'N';
 	%repeat until good cutoff is found
@@ -236,9 +239,11 @@ if (bgMethod ==1)
 				end
 			end
 		end
-		
+
 		response = input('Are you happy with the cutoff? [Y/N]', 's');
 	end
+
+	fprintf(1,'Great. Cutoff set @ '+cutoff);
 
 end
 
@@ -249,11 +254,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% default: slow & accurate method
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					%%% default: slow & accurate method
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if (qFindMethod == 0)
-
+	%run pkfnd for all layers
 
 
 
@@ -264,9 +269,9 @@ end
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%
-%%% fast & clumsy method
-%%%%%%%%%%%%%%%%%%%%%%%%
+							%%%%%%%%%%%%%%%%%%%%%%%%
+							%%% fast & clumsy method
+							%%%%%%%%%%%%%%%%%%%%%%%%
 if (qFindMethod == 1)
 
 
@@ -299,7 +304,7 @@ if (qFindMethod == 1)
 	end
 
 	if (clump == 1)
-		qDots = pkfind(maxProfile, background, dotSize);
+		qDots = pkfnd(maxProfile, background, dotSize);
 	end
 
 end

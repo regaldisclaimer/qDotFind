@@ -53,8 +53,9 @@ end
 
 % bgMethod: Algorithm code for how the background is determined
 %
-% 0:	default. plots distribution and prompts for background value.
-% 1:	conservative. plots distribution and prompts for background and cutoff
+% 0:	dafault: median + 3* SD = background
+% 1:	feedback: plots distribution and prompts for background value.
+% 2:	conservative fb: plots distribution and prompts for background and cutoff
 
 % qFindMethod: Method for finding qDots
 %
@@ -331,3 +332,6 @@ end
 %%%%%	%%%%%	Section 11: Plot Output 						%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%implay can be used for multiframe image array.
+%%implay(I, FPS)
+%%grayscale image can be M-N-K array

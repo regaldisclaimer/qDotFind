@@ -55,7 +55,14 @@ function coord = locMax(image, background, size, clump);
 	%image: source image for maxima location
 	%background: background for the given layer
 	%size: suspected diameter for peaks
-	%clump: ignore all points in clump if 0. Keep brightest if 1.
+	%clump: 
+	% 1:	legacy. keep brightest pixel in clumps
+	% 2:	don't check for clumps
+	%
+	% x:	default. ignore all points in clumps. checks border of size and makes sure
+	%			that all points on the border is lower than background + x * (peak-background).
+	%			x is allowance between 0 and 1.
+	%			x will default to 0.25 if x = 0.
 
 %Output: 
 	%coordinates. Column1: x coord. Column2: y coord.
@@ -97,8 +104,83 @@ foundmax = foundMax';
 %exclude clumps
 [foundPeaks, unused] = size(foundMax);
 
+
+%%Remove ones on edges
 if (foundPeaks > 0)
-	
+	index = find(foundMax(:,1) > size & foundMax(:,1) < (imgHeight-size) & foundMax(:,2) > size & foundMax(:,2) < (imgWidth-size));
+	foundMax = foundMax(index,:);
+end
 
-
+%%Remove clump
 if (foundPeaks > 1)
+
+	%map peaks
+	peakMap = 0.*image;
+	for (i = 1:foundPeaks)
+		peakMap(foundMax(i,1),foundMax(i,2)) = image(foundMax(i,1),foundMaxi,2));
+	end
+
+
+	if (clump == 1)
+
+		%keep the brightest
+
+		for (i = 1:foundPeaks)
+			%locMax of region of radius size/2
+			[maxRow, indexi] = max(peakMap((foundMax(i,1)-floor(size/2)):(foundMax(i,1)+(floor(size/2)+1)),(foundMax(i,2)-floor(size/2)):(foundMax(i,2)+(floor(size/2)+1))));
+			[maxVal, indexj] = max(maxRow);
+			%empty the region
+			peakMap((foundMax(i,1)-floor(size/2)):(foundMax(i,1)+(floor(size/2)+1)),(foundMax(i,2)-floor(size/2)):(foundMax(i,2)+(floor(size/2)+1)))=0;
+
+			%reinstate the highest
+			peakMap(foundMax(i,1)-floor(size/2)+indexi(indexj)-1,foundMax(i,2)-floor(size/2)+indexj-1)=maxVal;
+		end
+
+		%get coordinates
+		index = find(peakMap > 0);
+		foundMax = [mod(index, imgHeight), floor(index/imgHeight) +1];
+	end
+
+	if (clump == 2)
+		%% -> don't bother with clumps
+	end
+
+	if (clump > 0)
+		%%remove the whole thing. Border around must be lower than bg + A*(Max-bg).
+		
+		borderSize = size + 2;
+
+		%define border
+		for (i = 1:foundPeaks)
+
+			filledBorder = peakMap((foundMax(i,1)-floor(borderSize/2)):(foundMax(i,1)+(floor(borderSize/2)+1)),(foundMax(i,2)-floor(borderSize/2)):(foundMax(i,2)+(floor(borderSize/2)+1)));
+			inner = peakMap((foundMax(i,1)-floor(size/2)):(foundMax(i,1)+(floor(size/2)+1)),(foundMax(i,2)-floor(size/2)):(foundMax(i,2)+(floor(size/2)+1)));
+			border = setdiff(filledBorder, inner);
+
+			maxVal = max(max(border));
+
+			borderThreshold = background + clump * (maxVal-background);
+
+			%% at least 1 pixel is above border threshold
+			if (find(border > borderThreshold) > 0)
+				%%make inner portion negative
+			end
+
+			%%also check if negative value on border
+
+			
+
+		end
+	end
+end
+
+%%Return coordinates
+
+if (size(foundMax) > 0)
+	coord(:,1) = foundMax(:,1);
+	coord(:,2) = foundMax(:,2);
+end
+
+if (size(foundMax) == 0)
+	coord = [];
+end

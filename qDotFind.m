@@ -44,7 +44,7 @@
 %%%%%	%%%%%	Section 0: Options 								%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function void = qdf(bgMethod, qFindMethod, dotSize,clump, addContrast, debugMode)
+function void = qdf(bgMethod, qFindMethod, dotSize, clump, addContrast, debugMode)
 
 % check to make sure all arguments are passed in for safety.
 if(nargin>5)
@@ -68,16 +68,20 @@ end
 %
 
 % clump: whether clumps are completely ignored, or treated as one qdot.
-%
-% 0:	default. ignore all points in clumps
+%		
 % 1:	legacy. keep brightest pixel in clumps
+% 2:	don't check for clumps
+%
+% x:	default. ignore all points in clumps. checks border of size and makes sure
+%			that all points on the border is lower than background + x * (peak-background).
+%			x is allowance between 0 and 1.
+%			x will default to 0.25 if x = 0.
+
 
 % debugMode: turn debug comments on or off
 % 
 % 0:	default. no debug messages
 % 1: 	comments will show to help you debug problems
-
-
 
 
 
@@ -154,11 +158,19 @@ end
 %%%%%	%%%%%	Section 4: Distribution + Background selection	%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 %%%
-%%% default method (background only)
+%%% default method (median+3*SD)
 %%%
 if (bgMethod == 0)
+
+end
+
+
+
+%%%
+%%% feedback method (background only)
+%%%
+if (bgMethod == 1)
 
 	firstFrameData = tiffReadStack(firstFrame).data;
 
@@ -196,7 +208,7 @@ end
 %%%
 %%% conservative method (background and cutoff)
 %%%
-if (bgMethod ==1)
+if (bgMethod ==2)
 
 	%plot first frame intensity
 	hist(tiffReadStack(firstFrame).data, 100);

@@ -48,7 +48,7 @@ function void = qdf(bgMethod, qFindMethod, dotSize,clump, addContrast, debugMode
 
 % check to make sure all arguments are passed in for safety.
 if(nargin>5)
-	error('WARNING: MISSING ARGUMENT(S). PROGRAM EXITING')
+	error('WARNING: MISSING ARGUMENT(S). PROGRAM EXITING');
 end
 
 % bgMethod: Algorithm code for how the background is determined

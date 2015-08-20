@@ -153,23 +153,40 @@ if (foundPeaks > 1)
 		%define border
 		for (i = 1:foundPeaks)
 
-			filledBorder = peakMap((foundMax(i,1)-floor(borderSize/2)):(foundMax(i,1)+(floor(borderSize/2)+1)),(foundMax(i,2)-floor(borderSize/2)):(foundMax(i,2)+(floor(borderSize/2)+1)));
-			inner = peakMap((foundMax(i,1)-floor(size/2)):(foundMax(i,1)+(floor(size/2)+1)),(foundMax(i,2)-floor(size/2)):(foundMax(i,2)+(floor(size/2)+1)));
-			border = setdiff(filledBorder, inner);
+
+			%border is the set of coords. peakMap(i,j)
+			for (i = (foundMax(i,1)-floor(borderSize/2)):(foundMax(i,1)+(floor(borderSize/2)+1)))
+				for (j = (foundMax(i,2)-floor(borderSize/2)):(foundMax(i,2)+(floor(borderSize/2)+1)))
+					%add indices
+					border = [border, (i,j)];
+				end
+			end
+
+			for (i = (foundMax(i,1)-floor(size/2)):(foundMax(i,1)+(floor(size/2)+1)))
+				for (j = (foundMax(i,2)-floor(size/2)):(foundMax(i,2)+(floor(size/2)+1)))
+					%remove indices
+					border = setdiff(border, [i,j]);
+				end
+			end
+
+
+
+			% filledBorder = peakMap((foundMax(i,1)-floor(borderSize/2)):(foundMax(i,1)+(floor(borderSize/2)+1)),(foundMax(i,2)-floor(borderSize/2)):(foundMax(i,2)+(floor(borderSize/2)+1)));
+			% inner = peakMap((foundMax(i,1)-floor(size/2)):(foundMax(i,1)+(floor(size/2)+1)),(foundMax(i,2)-floor(size/2)):(foundMax(i,2)+(floor(size/2)+1)));
+			
+			% %not sure if this works.
+
+			% border = setdiff(filledBorder, inner);
 
 			maxVal = max(max(border));
 
 			borderThreshold = background + clump * (maxVal-background);
 
-			%% at least 1 pixel is above border threshold
-			if (find(border > borderThreshold) > 0)
+			%% at least 1 pixel is above border threshold or negative
+			if (find((peakMap(border(:)) > borderThreshold)|(peakMap(border(:)) < 0) > 0)
 				%%make inner portion negative
+				peakMap(border(:)) = -1;
 			end
-
-			%%also check if negative value on border
-
-			
-
 		end
 	end
 end

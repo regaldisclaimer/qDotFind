@@ -56,6 +56,7 @@ end
 % 0:	dafault: median + 3* SD = background
 % 1:	feedback: plots distribution and prompts for background value.
 % 2:	conservative fb: plots distribution and prompts for background and cutoff
+% 3:	legacy: 3 * second smallest from the projection
 
 % qFindMethod: Method for finding qDots
 %
@@ -158,10 +159,30 @@ end
 %%%%%	%%%%%	Section 4: Distribution + Background selection	%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+if (debugMode == 1)
+	tic;
+	fprintf(1,'Section 4 start');
+end
+
 %%%
 %%% default method (median+3*SD)
 %%%
 if (bgMethod == 0)
+
+	firstFrameData = tiffReadStack(firstFrame).data;
+
+	%calc. median
+	firstMedian = median(firstFrameData);
+
+	%calc. S.D.
+	firstSTD = std(firstFrameData);
+
+	background = firstMedian + 3*(firstSTD);
+
+
+	if (debugMode == 1)
+		fprintf(1,'Background is set at: '+background);
+	end
 
 end
 
@@ -260,12 +281,49 @@ if (bgMethod ==2)
 
 end
 
+%%%
+%%% legacy method
+%%%
+if (bgMethod ==3)
+
+
+	maxProfile = zero(fileHeight, fileWidth);
+
+	%for each layer in stack
+	for i = firstFrame:numStack
+		thisLayer = double(tiffReadStack(i).data);
+		%for each pixel
+		for j = fileHeight
+			for k = fileWidth
+				%store the higher value
+				if (thisLayer(j,k)>maxProfile(j,k))
+					maxProfile(j,k) = thisLayer(j,k);
+				end
+			end
+		end
+	end
+
+	background = 3*min(setdiff(maxProfile(:),min(maxProfile(:))));
+
+	if (debugMode == 1)
+		fprintf(1,'Background set as ' +background+ ' using legacy method');
+	end
+end
+
+
+if (debugMode == 1)
+	tocTime = toc;
+	fprintf(1,'Section 4 took: '+ tocTime);
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%	%%%%%	Section 6: Locate Quantum Dots 					%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+if (debugMode == 1)
+	tic;
+	fprintf(1,'Section 5 start');
+end
 
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 					%%% default: slow & accurate method
@@ -273,6 +331,7 @@ end
 if (qFindMethod == 0)
 	%run pkfnd for all layers
 
+	
 
 
 
@@ -307,22 +366,17 @@ if (qFindMethod == 1)
 		end
 	end
 
-
-	%%%
 	%%% Find local maxima
-	%%%
 
-	if (clump == 0)
-		%%use locMax here
-	end
-
-	if (clump == 1)
-		qDots = pkfnd(maxProfile, background, dotSize);
-	end
+	qDots = locMax(maxProfile, background, dotsize, clump);
 
 end
 
 
+if (debugMode == 1)
+	tocTime = toc;
+	fprintf(1,'Section 5 took: '+tocTime);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%	%%%%%	Section 7: Plot Distribution 					%%%%%	%%%%%

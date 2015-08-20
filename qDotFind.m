@@ -331,13 +331,14 @@ end
 if (qFindMethod == 0)
 	%run pkfnd for all layers
 
-	
+	qDotLayers
 
 
 
 
 
 end
+
 
 
 

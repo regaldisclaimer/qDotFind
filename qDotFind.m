@@ -44,7 +44,7 @@
 %%%%%	%%%%%	Section 0: Options 								%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function void = qDotFind(bgMethod, qFindMethod, dotSize, clump, addContrast, debugMode)
+function void = qDotFind(bgMethod, qFindMethod, dotSize, clump, debugMode)
 
 % check to make sure all arguments are passed in for safety.
 if(nargin>5)

@@ -44,7 +44,7 @@
 %%%%%	%%%%%	Section 0: Options 								%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function void = qdf(bgMethod, qFindMethod, dotSize, clump, addContrast, debugMode)
+function void = qDotFind(bgMethod, qFindMethod, dotSize, clump, addContrast, debugMode)
 
 % check to make sure all arguments are passed in for safety.
 if(nargin>5)
@@ -402,3 +402,5 @@ end
 %%implay can be used for multiframe image array.
 %%implay(I, FPS)
 %%grayscale image can be M-N-K array
+
+

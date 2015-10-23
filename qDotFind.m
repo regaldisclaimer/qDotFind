@@ -205,6 +205,8 @@ if (bgMethod == 1)
 		background = input('Enter a guess for the baseline');
 		%plot dots
 
+
+		%may consider adding contrast range: imshow(firstFrameData, [low, high])
 		imshow(firstFrameData);
 
 		for (i = 1:fileHeight)

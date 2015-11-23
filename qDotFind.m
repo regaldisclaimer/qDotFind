@@ -25,8 +25,11 @@
 %%
 %%
 %%	Utilizes:
-%%		pkfnd.m by Eric R. Dufresne (Yale University)
-%%		tiffread2.m by Francois Nedelec (nedelec@embl.de)
+%%
+%%		locMax.m
+%%				influenced by:	pkfnd.m by Eric R. Dufresne (Yale University)
+%%								tiffread2.m by Francois Nedelec (nedelec@embl.de)
+%%
 %%
 %%
 %%	Usage:
@@ -147,12 +150,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%	%%%%%	Section 3: Format Input Data 					%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -331,13 +328,13 @@ end
 					%%% default: slow & accurate method
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if (qFindMethod == 0)
-	%run pkfnd for all layers
+	%run locMax for all layers
 
-	qDotLayers
-
-
-
-
+	%for each layer
+	for i = firstFrame:numStack
+		thisLayer = double(tiffReadStack(i).data);
+		qDotLayers(i) = locMax(thisLayer, background, dotsize, clump);
+	end
 
 end
 
@@ -371,7 +368,7 @@ if (qFindMethod == 1)
 
 	%%% Find local maxima
 
-	qDots = locMax(maxProfile, background, dotsize, clump);
+	qDotLayer = locMax(maxProfile, background, dotsize, clump);
 
 end
 
@@ -385,17 +382,85 @@ end
 %%%%%	%%%%%	Section 7: Plot Distribution 					%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+%show distribution of local maxima 
+if (qFindMethod == 0)
+
+	%%initialize hist stack
+
+	histStack = [];
+
+	for i = firstFrame:numStack
+		%%hist stack
+		histStack[1] = hist(qDotLayers(i), 100);
+	end
+
+	figure
+	implay(histStack);
+
+end
+
+if (qFindMethod == 1)
+	figure
+	hist(qDotLayer, 100);
+end
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%	%%%%%	Section 8: Determine Threshold 					%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%receive input for threshold
+
+%show image and dots
+
+thresResponse = 'N';
+
+while ~((response == 'Y') | (response == 'y'))
+	eventThreshold = input('Enter a guess for the event threshold');
+
+	figure
+	imshow(firstFrameData, [min(firstFrameData(:)), eventThreshold]])
+
+	%plot events
+	for q=1:size(qDotLayer,1)
+	    %draws rect. on incorrect position. should draw 0.5 up and 0.5 left.
+	    rectangle('Position', [qDotLayer(q,1)-0.5,qDotLayer(q,2)-0.5,1,1], ...
+	        'LineStyle', 'none', 'FaceColor', 'r')
+	end
+
+	thresResponse = input('Are you happy with the event threshold? [Y/N]');
+
+end
+
+fprintf(1, 'Great. Event Threshold set @ ' +eventThreshold);
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%	%%%%%	Section 9: Determine Events 					%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%determine events 
+if (qFindMethod == 0)
+
+
+end
+
+if (qFindMethod == 1)
+
+end
+
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%	%%%%%	Section 10: Format Output Data 					%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%	%%%%%	Section 11: Plot Output 						%%%%%	%%%%%

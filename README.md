@@ -34,16 +34,16 @@ Author Contact: regaldisclaimer@gmail.com
 qDotFind currently accepts 5 different as you can see:
 
 ````Matlab
-function void = qdf(bgMethod, qFindMethod, dotRadius, addContrast, debugMode);
+function void = qDotFind(bgMethod, qFindMethod, dotSize, clump, debugMode);
 ````
 
-To run the program, type `qdf()` in the command line with appropriate option arguments.
+To run the program, type `qDotFind()` in the command line with appropriate option arguments.
 For example, to set `bgMethod = 0`, `qFindMethod = 1`, `dotRadius = 0`, `addContrast = 0`, `debugMode = 1`
 
 You will run the following in the command line:
 
 ````Matlab
-qdf(0,1,0,0,1)
+qDotFind(0,1,0,0,1)
 ````
 
 

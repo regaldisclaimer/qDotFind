@@ -425,7 +425,6 @@ while ~((response == 'Y') | (response == 'y'))
 
 	%plot events
 	for q=1:size(qDotLayer,1)
-	    %draws rect. on incorrect position. should draw 0.5 up and 0.5 left.
 	    rectangle('Position', [qDotLayer(q,1)-0.5,qDotLayer(q,2)-0.5,1,1], ...
 	        'LineStyle', 'none', 'FaceColor', 'r')
 	end
@@ -443,16 +442,97 @@ fprintf(1, 'Great. Event Threshold set @ ' +eventThreshold);
 
 %determine events 
 if (qFindMethod == 0)
+	%consolidate list of qDots
+	%could setdiff, but ordering issues
+	%just iterate
 
+	qDotPresence = zeros(fileHeight, fileWidth);
+
+	for s=firstFrame:numStack
+		for p=1:size(qDotLayers,1)
+			thisLayer = qDotLayers(p);
+			qDotPresence(thisLayer(q,2),thisLayer(q,1));
+		end
+	end
+
+
+	for (i = 1:fileHeight)
+		for (j = 1:fileWidth)
+			if qDotPresence(i,j)==1
+				%qDot exists here
+				qDotLayer(end+1,1) = i;
+				qDotLayer(end+1,2) = j;
+			end
+		end
+	end
+end
+
+
+
+
+
+
+
+%fetch intensity of each qdot for each frame
+dotHistory = zeros(numStack, size(qDotLayer,1));
+
+%for each dot
+for q=1:size(qDotLayer,1)
+
+	%qDot intensity for current qDot
+	thisQDots = zeros(numStack);
+
+	%look through all stacks
+
+	for s=firstFrame:numStack
+
+		%takes intensity of q'th qDot in s'th frame
+		thisQDots = double(stack(s).data(qDotLayer(q,2), qDotLayer(q,1)));
+	end
+
+
+	%store this layer to total
+	dotHistory(:,q) = thisQDots;
 
 end
 
-if (qFindMethod == 1)
+%calc. average intensity of qDot over next 10 frames
+%for each qDot
 
+for r=1:size(dotHistory,2)
+	%from 1 to number of stacks -10
+	for t=1:numStack-10
+		%histAvg: #stack-10 x #qdot (double)
+		%take average of 10 frames from t'th frame for each qDot
+		histAvg(t,r) = mean(dotHistory(t:t+1-,r));
+	end
 end
 
+%qDotEvents: #ofEvent x 2(double)
+qDotEvents = [];
 
+%n goes from 1 to # of qDot
+for n=1:size(res,2)
 
+    %%for n'th quantum dot, find last frame for which 10frame average was higher than threshold 
+    %"off occurs the last frame before the smoothed average falls below the event threshold"
+    off=find(smooth(:,n)>qthresh,1,'last'); 
+
+    %for how many frames the qdot is above the event threshold
+    count=length(find(smooth(1:off,n)>qthresh));
+
+    %Obscure conditions for weeding out events. Conditions:
+    %Off event exists && last frame is at least 100 frames from start frame &&
+    %last frame is at least 100 frames from the last frame &&
+    %length of the event should be greater than half of the last frame number??? obscure...
+    %Average intensity of this quantumdot over the first 10 frames is greater than the threshold
+    %these conditions dramatically reduce monitored dots, and no rationale specified.
+
+    if ~isempty(off) && off>start+100 && off<num-100 && count>off/2 && smooth(1,n)>qthresh  
+        %add frame/10, presumably seconds, and which quantumdot it was
+        events=[events; [off/10,n]];
+    end
+end
 
 
 
@@ -471,3 +551,25 @@ end
 %%grayscale image can be M-N-K array
 
 
+
+for i=firstFrame:numStack
+	allData(i) = tiffReadStack(i).data;
+end
+
+
+figure
+plot(dotHistory(:,(qDotEvents(:,2))))
+
+implay(allData)
+
+%plot events
+for q=1:size(qDotEvents,1)
+    rectangle('Position', [qDotLayer(q,1)-1.5,qDotLayer(q,2)-1.5,0.5,0.5], ...
+        'LineStyle', 'none', 'FaceColor', 'r')
+    rectangle('Position', [qDotLayer(q,1)+1,qDotLayer(q,2)-1.5,0.5,0.5], ...
+        'LineStyle', 'none', 'FaceColor', 'r')
+    rectangle('Position', [qDotLayer(q,1)-1.5,qDotLayer(q,2)+1,0.5,0.5], ...
+        'LineStyle', 'none', 'FaceColor', 'r')
+    rectangle('Position', [qDotLayer(q,1)+1,qDotLayer(q,2)+1,0.5,0.5], ...
+        'LineStyle', 'none', 'FaceColor', 'r')
+end

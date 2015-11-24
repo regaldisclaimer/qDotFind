@@ -50,7 +50,7 @@
 function void = qDotFind(bgMethod, qFindMethod, dotSize, clump, debugMode)
 
 % check to make sure all arguments are passed in for safety.
-if(nargin>5)
+if(nargin<5)
 	error('WARNING: MISSING ARGUMENT(S). PROGRAM EXITING');
 end
 

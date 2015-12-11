@@ -609,6 +609,9 @@ end
 
 implay(allData)
 
+
+figure(06)
+imshow(firstFrameData);
 %plot events
 for q=1:size(qDotEvents,1)
     rectangle('Position', [qDotLayer(q,1)-1.5,qDotLayer(q,2)-1.5,0.5,0.5], ...

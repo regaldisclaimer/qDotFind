@@ -47,12 +47,24 @@
 %%%%%	%%%%%	Section 0: Options 								%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function void = qDotFind(bgMethod, qFindMethod, dotSize, clump, debugMode)
+%function ans= qDotFind(bgMethod, qFindMethod, dotSize, clump, debugMode)
 
 % check to make sure all arguments are passed in for safety.
-if(nargin<5)
-	error('WARNING: MISSING ARGUMENT(S). PROGRAM EXITING');
-end
+%if(nargin<5)
+%	error('WARNING: MISSING ARGUMENT(S). PROGRAM EXITING');
+%end
+
+
+%%Run with inbuilt options for debug
+bgMethod = 1;
+qFindMethod = 0;
+dotSize = 3;
+clump = 0;
+debugMode = 1;
+
+
+
+
 
 % bgMethod: Algorithm code for how the background is determined
 %
@@ -138,8 +150,10 @@ fileWidth = tiffReadStack(1).width;
 fileHeight = tiffReadStack(1).height;
 
 if (debugMode == 1)
-	fprintf(1, 'Image width is: '+fileWidth);
-	fprintf(1, 'Image height is: '+fileHeight);
+	formatSpec = '\n Image width is: %d';
+	fprintf(formatSpec, fileWidth);
+	formatSpec = '\n Image height is: %d';
+	fprintf(formatSpec, fileHeight);
 end
 
 %
@@ -158,7 +172,7 @@ end
 
 if (debugMode == 1)
 	tic;
-	fprintf(1,'Section 4 start');
+	fprintf(1,'\n Section 4 start');
 end
 
 %%%
@@ -178,7 +192,8 @@ if (bgMethod == 0)
 
 
 	if (debugMode == 1)
-		fprintf(1,'Background is set at: '+background);
+		formatSpec = '\n Background is set at: %d';
+		fprintf(formatSpec, background);
 	end
 
 end
@@ -193,22 +208,24 @@ if (bgMethod == 1)
 	firstFrameData = tiffReadStack(firstFrame).data;
 
 	%plot first frame intensity
-	hist(firstFrameData, 100);
+	figure(01);
+	hist(double(firstFrameData), 100);
 
 	response = 'N';
 
 	%repeat until good value for background is found
-	while ~((response == 'Y')| (response == 'y'))
-		background = input('Enter a guess for the baseline');
+	while ~((response == 'Y')|| (response == 'y'))
+		background = input('\n Enter a guess for the baseline');
 		%plot dots
 
 
 		%may consider adding contrast range: imshow(firstFrameData, [low, high])
+		figure(02);
 		imshow(firstFrameData);
 
-		for (i = 1:fileHeight)
-			for (j = 1:fileWidth)
-				if (firstFrameData(i,j) >= background)
+		for i = 1:fileHeight
+			for j = 1:fileWidth
+				if firstFrameData(i,j) >= background
 					rectangle('Position',[i, j, 1, 1],...
 							  'LineStyle', '--',...
 							  'LineWidth', 0.1,...
@@ -217,10 +234,11 @@ if (bgMethod == 1)
 			end
 		end
 
-		response = input('Are you happy with the baseline? [Y/N]');
+		response = input('\n Are you happy with the baseline? [Y/N]');
 	end
 
-	fprintf(1,'Great. Background set @ '+background);
+	formatSpec = '\n Great. Background set @ %d';
+	fprintf(formatSpec, background);
 
 end
 
@@ -236,13 +254,13 @@ if (bgMethod ==2)
 	response = 'N';
 
 	%repeat until good value for background is found
-	while ~((response == 'Y')| (response == 'y'))
-		background = input('Enter a guess for the baseline', 's');
+	while ~((response == 'Y')|| (response == 'y'))
+		background = input('\n Enter a guess for the baseline', 's');
 		%plot dots
 
-		for (i = 1:fileHeight)
-			for (j = 1:fileWidth)
-				if (firstFrameData(i,j) >= background)
+		for i = 1:fileHeight
+			for j = 1:fileWidth
+				if firstFrameData(i,j) >= background
 					rectangle('Position',[i, j, 1, 1],...
 							  'LineStyle', '--',...
 							  'LineWidth', 0.1,...
@@ -251,20 +269,20 @@ if (bgMethod ==2)
 			end
 		end
 
-		response = input('Are you happy with the baseline? [Y/N]', 's');
+		response = input('\n Are you happy with the baseline? [Y/N]', 's');
 	end
-
-	fprintf(1,'Great. Background set @ '+background);
+	formatSpec = '\n Great. Background set @ %d';
+	fprintf(formatSpec, background);
 
 	response = 'N';
 	%repeat until good cutoff is found
-	while ~((response == 'Y')| (response == 'y'))
-		cutoff = input('Enter a guess for the cutoff', 's');
+	while ~((response == 'Y')|| (response == 'y'))
+		cutoff = input('\n Enter a guess for the cutoff', 's');
 		%plot dots
 		
-		for (i = 1:fileHeight)
-			for (j = 1:fileWidth)
-				if (firstFrameData(i,j) >= background)
+		for i = 1:fileHeight
+			for j = 1:fileWidth
+				if firstFrameData(i,j) >= background
 					rectangle('Position',[i, j, 1, 1],...
 							  'LineStyle', '--',...
 							  'LineWidth', 0.1,...
@@ -273,10 +291,10 @@ if (bgMethod ==2)
 			end
 		end
 
-		response = input('Are you happy with the cutoff? [Y/N]', 's');
+		response = input('\n Are you happy with the cutoff? [Y/N]', 's');
 	end
-
-	fprintf(1,'Great. Cutoff set @ '+cutoff);
+	formatSpec = '\n Great. Cutoff set @ %d';
+	fprintf(formatSpec, cutoff);
 
 end
 
@@ -305,14 +323,16 @@ if (bgMethod ==3)
 	background = 3*min(setdiff(maxProfile(:),min(maxProfile(:))));
 
 	if (debugMode == 1)
-		fprintf(1,'Background set as ' +background+ ' using legacy method');
+		formatSpec = '\n Background set as %d using legacy method';
+		fprintf(formatSpec, background);
 	end
 end
 
 
 if (debugMode == 1)
 	tocTime = toc;
-	fprintf(1,'Section 4 took: '+ tocTime);
+	formatSpec = '\n Section 4 took: %f'
+	fprintf(formatSpec, tocTime);
 end
 
 
@@ -321,7 +341,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if (debugMode == 1)
 	tic;
-	fprintf(1,'Section 5 start');
+	fprintf(1,'\n Section 5 start');
 end
 
 					%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -330,10 +350,12 @@ end
 if (qFindMethod == 0)
 	%run locMax for all layers
 
+    qDotLayers = zeros(numStack);
+    
 	%for each layer
 	for i = firstFrame:numStack
 		thisLayer = double(tiffReadStack(i).data);
-		qDotLayers(i) = locMax(thisLayer, background, dotsize, clump);
+		qDotLayers(i) = locMax(thisLayer, background, dotSize, clump);
 	end
 
 end
@@ -375,7 +397,8 @@ end
 
 if (debugMode == 1)
 	tocTime = toc;
-	fprintf(1,'Section 5 took: '+tocTime);
+	formatSpec = '\n Section 5 took: %f';
+	fprintf(formatSpec, tocTime);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -388,15 +411,15 @@ if (qFindMethod == 0)
 
 	%%initialize hist stack
 
-	histStack = [];
+%	histStack = [];
 
-	for i = firstFrame:numStack
-		%%hist stack
-		histStack[1] = hist(qDotLayers(i), 100);
-	end
+%	for i = firstFrame:numStack
+%		%%hist stack
+%		histStack[1] = hist(qDotLayers(i), 100);
+%	end
 
 	figure
-	implay(histStack);
+	implay(hist(qDotLayers(firstFrame:numStack),100));
 
 end
 
@@ -417,11 +440,11 @@ end
 
 thresResponse = 'N';
 
-while ~((response == 'Y') | (response == 'y'))
-	eventThreshold = input('Enter a guess for the event threshold');
+while ~((response == 'Y') || (response == 'y'))
+	eventThreshold = input('\n Enter a guess for the event threshold');
 
 	figure
-	imshow(firstFrameData, [min(firstFrameData(:)), eventThreshold]])
+	imshow(firstFrameData, [min(firstFrameData(:)), eventThreshold])
 
 	%plot events
 	for q=1:size(qDotLayer,1)
@@ -429,11 +452,12 @@ while ~((response == 'Y') | (response == 'y'))
 	        'LineStyle', 'none', 'FaceColor', 'r')
 	end
 
-	thresResponse = input('Are you happy with the event threshold? [Y/N]');
+	thresResponse = input('\n Are you happy with the event threshold? [Y/N]');
 
 end
 
-fprintf(1, 'Great. Event Threshold set @ ' +eventThreshold);
+formatSpec = '\n Great. Event Threshold set @ %d';
+fprintf(formatSpec ,eventThreshold);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -456,8 +480,8 @@ if (qFindMethod == 0)
 	end
 
 
-	for (i = 1:fileHeight)
-		for (j = 1:fileWidth)
+	for i = 1:fileHeight
+		for j = 1:fileWidth
 			if qDotPresence(i,j)==1
 				%qDot exists here
 				qDotLayer(end+1,1) = i;
@@ -504,7 +528,7 @@ for r=1:size(dotHistory,2)
 	for t=1:numStack-10
 		%histAvg: #stack-10 x #qdot (double)
 		%take average of 10 frames from t'th frame for each qDot
-		histAvg(t,r) = mean(dotHistory(t:t+1-,r));
+		histAvg(t,r) = mean(dotHistory(t:t+10,r));
 	end
 end
 
@@ -530,7 +554,7 @@ for n=1:size(res,2)
 
     if ~isempty(off) && off>start+100 && off<num-100 && count>off/2 && smooth(1,n)>qthresh  
         %add frame/10, presumably seconds, and which quantumdot it was
-        events=[events; [off/10,n]];
+        qDotEvents=[qDotEvents; [off/10,n]];
     end
 end
 

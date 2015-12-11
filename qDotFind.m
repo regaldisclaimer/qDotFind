@@ -623,5 +623,5 @@ end
 
 
 
-figure(06)
-plot(dotHistory(:,(qDotEvents(:,2)))) 
+%figure(06)
+%plot(dotHistory(:,(qDotEvents(:,2)))) 

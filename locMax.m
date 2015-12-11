@@ -196,8 +196,8 @@ end
 %%Return coordinates
 
 if (size(foundMax) > 0)
-	coord(:,1) = foundMax(:,1);
-	coord(:,2) = foundMax(:,2);
+	coord(:,2) = foundMax(:,1);
+	coord(:,1) = foundMax(:,2);
 end
 
 if (size(foundMax) == 0)

@@ -56,11 +56,11 @@
 
 
 %%Run with inbuilt options for debug
-firstFrame = 10;
+firstFrame = 1;
 bgMethod = 1;
-qFindMethod = 0;
-dotSize = 3;
-clump = 0;
+qFindMethod = 1;
+dotSize = 2;
+clump = 2;
 debugMode = 1;
 
 
@@ -185,11 +185,13 @@ if (bgMethod == 0)
 
 	%calc. median
 	firstMedian = median(firstFrameData);
+	finalMedian = mean(firstMedian);
 
 	%calc. S.D.
-	firstSTD = std(firstFrameData);
+	firstSTD = std(double(firstFrameData));
+	finalSTD = mean(firstSTD);
 
-	background = firstMedian + 3*(firstSTD);
+	background = finalMedian + uint16(floor(3*(finalSTD)));
 
 
 	if (debugMode == 1)
@@ -351,12 +353,18 @@ end
 if (qFindMethod == 0)
 	%run locMax for all layers
 
-    qDotLayers = zeros(numStack);
+    %qDotLayers = zeros(numStack);
     
 	%for each layer
 	for i = firstFrame:numStack
 		thisLayer = double(tiffReadStack(i).data);
-		qDotLayers(i) = locMax(thisLayer, background, dotSize, clump);
+
+		qDotLayers = struct;
+
+		%thisData = locMax(thisLayer, background, dotSize, clump);
+		thisData = pkfnd(thisLayer, background, dotSize);
+
+		qDotLayers(i).data = thisData;
 	end
 
 end
@@ -364,7 +372,7 @@ end
 
 
 
-							%%%%%%%%%%%%%%%%%%%%%%%%
+							%%%%%%%%%%%%%%%%%%%%%%%%	
 							%%% fast & clumsy method
 							%%%%%%%%%%%%%%%%%%%%%%%%
 if (qFindMethod == 1)
@@ -373,7 +381,7 @@ if (qFindMethod == 1)
 	%%%
 	%%%create aggregate maximum intensity profile
 	%%%
-	maxProfile = zero(fileHeight, fileWidth);
+	maxProfile = firstFrameData;
 
 	%for each layer in stack
 	for i = firstFrame:numStack
@@ -391,7 +399,8 @@ if (qFindMethod == 1)
 
 	%%% Find local maxima
 
-	qDotLayer = locMax(maxProfile, background, dotsize, clump);
+	%qDotLayer = locMax(maxProfile, background, dotSize, clump);
+	qDotLayer = pkfnd(maxProfile, background, dotSize);
 
 end
 
@@ -419,13 +428,13 @@ if (qFindMethod == 0)
 %		histStack[1] = hist(qDotLayers(i), 100);
 %	end
 
-	figure
-	implay(hist(qDotLayers(firstFrame:numStack),100));
+	figure(03)
+	implay(hist(qDotLayers(firstFrame:numStack).data,100));
 
 end
 
 if (qFindMethod == 1)
-	figure
+	figure(03)
 	hist(qDotLayer, 100);
 end
 
@@ -441,10 +450,10 @@ end
 
 thresResponse = 'N';
 
-while ~((response == 'Y') || (response == 'y'))
+while ~((thresResponse == 'Y')|| (thresResponse == 'y'))
 	eventThreshold = input('\n Enter a guess for the event threshold: ');
 
-	figure
+	figure(04)
 	imshow(firstFrameData, [min(firstFrameData(:)), eventThreshold])
 
 	%plot events
@@ -475,7 +484,7 @@ if (qFindMethod == 0)
 
 	for s=firstFrame:numStack
 		for p=1:size(qDotLayers,1)
-			thisLayer = qDotLayers(p);
+			thisLayer = qDotLayers.data(p);
 			qDotPresence(thisLayer(q,2),thisLayer(q,1));
 		end
 	end
@@ -537,7 +546,7 @@ end
 qDotEvents = [];
 
 %n goes from 1 to # of qDot
-for n=1:size(res,2)
+for n=1:size(dotHistory,2)
 
     %%for n'th quantum dot, find last frame for which 10frame average was higher than threshold 
     %"off occurs the last frame before the smoothed average falls below the event threshold"
@@ -578,12 +587,13 @@ end
 
 
 for i=firstFrame:numStack
-	allData(i) = tiffReadStack(i).data;
+	allData{i} = tiffReadStack(i).data;
 end
 
 
-figure
-plot(dotHistory(:,(qDotEvents(:,2))))
+figure(05)
+plot(dotHistory(:,(qDotEvents(:,2)))) 
+
 
 implay(allData)
 

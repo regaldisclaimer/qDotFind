@@ -429,13 +429,22 @@ if (qFindMethod == 0)
 %	end
 
 	figure(03)
-	implay(hist(qDotLayers(firstFrame:numStack).data,100));
+	%implay(hist(qDotLayers(firstFrame:numStack).data,100));
 
 end
 
 if (qFindMethod == 1)
+
+	qDotFirstLayerData = zeros(size(qDotLayer));
+
+	for n=1:size(qDotLayer)
+		a = qDotLayer(n,2);
+		b = qDotLayer(n,1);
+		qDotFirstLayerData(n) = firstFrameData(a,b);
+	end
+
 	figure(03)
-	hist(qDotLayer, 100);
+	hist(qDotFirstLayerData, 100);
 end
 
 
@@ -521,7 +530,7 @@ for q=1:size(qDotLayer,1)
 	for s=firstFrame:numStack
 
 		%takes intensity of q'th qDot in s'th frame
-		thisQDots = double(stack(s).data(qDotLayer(q,2), qDotLayer(q,1)));
+		thisQDots = double(tiffReadStack(s).data(qDotLayer(q,2), qDotLayer(q,1)));
 	end
 
 
@@ -550,10 +559,10 @@ for n=1:size(dotHistory,2)
 
     %%for n'th quantum dot, find last frame for which 10frame average was higher than threshold 
     %"off occurs the last frame before the smoothed average falls below the event threshold"
-    off=find(smooth(:,n)>qthresh,1,'last'); 
+    off=find(histAvg(:,n)>eventThreshold,1,'last'); 
 
     %for how many frames the qdot is above the event threshold
-    count=length(find(smooth(1:off,n)>qthresh));
+    count=length(find(histAvg(1:off,n)>eventThreshold));
 
     %Obscure conditions for weeding out events. Conditions:
     %Off event exists && last frame is at least 100 frames from start frame &&
@@ -562,7 +571,7 @@ for n=1:size(dotHistory,2)
     %Average intensity of this quantumdot over the first 10 frames is greater than the threshold
     %these conditions dramatically reduce monitored dots, and no rationale specified.
 
-    if ~isempty(off) && off>start+100 && off<num-100 && count>off/2 && smooth(1,n)>qthresh  
+    if ~isempty(off) && off>firstFrame+100 && off<numStack-100 && count>off/2 && histAvg(1,n)>eventThreshold  
         %add frame/10, presumably seconds, and which quantumdot it was
         qDotEvents=[qDotEvents; [off/10,n]];
     end
@@ -585,14 +594,17 @@ end
 %%grayscale image can be M-N-K array
 
 
+allData = [];
 
 for i=firstFrame:numStack
-	allData{i} = tiffReadStack(i).data;
+	allData = cat(4, allData, tiffReadStack(i).data);
 end
 
 
-figure(05)
-plot(dotHistory(:,(qDotEvents(:,2)))) 
+% figure(05)
+% imshow(firstFrameData)
+
+
 
 
 implay(allData)
@@ -608,3 +620,8 @@ for q=1:size(qDotEvents,1)
     rectangle('Position', [qDotLayer(q,1)+1,qDotLayer(q,2)+1,0.5,0.5], ...
         'LineStyle', 'none', 'FaceColor', 'r')
 end
+
+
+
+figure(06)
+plot(dotHistory(:,(qDotEvents(:,2)))) 

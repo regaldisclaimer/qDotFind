@@ -47,15 +47,16 @@
 %%%%%	%%%%%	Section 0: Options 								%%%%%	%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%function ans= qDotFind(bgMethod, qFindMethod, dotSize, clump, debugMode)
+%function ans= qDotFind(firstFrame, bgMethod, qFindMethod, dotSize, clump, debugMode)
 
 % check to make sure all arguments are passed in for safety.
-%if(nargin<5)
+%if(nargin<6)
 %	error('WARNING: MISSING ARGUMENT(S). PROGRAM EXITING');
 %end
 
 
 %%Run with inbuilt options for debug
+firstFrame = 10;
 bgMethod = 1;
 qFindMethod = 0;
 dotSize = 3;
@@ -110,7 +111,7 @@ debugMode = 1;
 
 % numStack:			number of images on the stack
 % firstFrame:		number of frame on which analysis should start
-firstFrame = 1;
+
 
 % background:		intensity value below which the pixel is considered background
 % eventThreshold:	intensity value below which qdot is considered to be off
@@ -215,7 +216,7 @@ if (bgMethod == 1)
 
 	%repeat until good value for background is found
 	while ~((response == 'Y')|| (response == 'y'))
-		background = input('\n Enter a guess for the baseline');
+		background = input('\n Enter a guess for the baseline: ');
 		%plot dots
 
 
@@ -255,7 +256,7 @@ if (bgMethod ==2)
 
 	%repeat until good value for background is found
 	while ~((response == 'Y')|| (response == 'y'))
-		background = input('\n Enter a guess for the baseline', 's');
+		background = input('\n Enter a guess for the baseline: ', 's');
 		%plot dots
 
 		for i = 1:fileHeight
@@ -277,7 +278,7 @@ if (bgMethod ==2)
 	response = 'N';
 	%repeat until good cutoff is found
 	while ~((response == 'Y')|| (response == 'y'))
-		cutoff = input('\n Enter a guess for the cutoff', 's');
+		cutoff = input('\n Enter a guess for the cutoff: ', 's');
 		%plot dots
 		
 		for i = 1:fileHeight
@@ -441,7 +442,7 @@ end
 thresResponse = 'N';
 
 while ~((response == 'Y') || (response == 'y'))
-	eventThreshold = input('\n Enter a guess for the event threshold');
+	eventThreshold = input('\n Enter a guess for the event threshold: ');
 
 	figure
 	imshow(firstFrameData, [min(firstFrameData(:)), eventThreshold])

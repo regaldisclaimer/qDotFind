@@ -46,7 +46,7 @@
 %%
 %%
 %%
-function coord = locMax(image, background, size, clump);
+function coord = locMax(image, background, dotSize, clump);
 
 
 
@@ -107,7 +107,7 @@ foundmax = foundMax';
 
 %%Remove ones on edges
 if (foundPeaks > 0)
-	index = find(foundMax(:,1) > size & foundMax(:,1) < (imgHeight-size) & foundMax(:,2) > size & foundMax(:,2) < (imgWidth-size));
+	index = find(foundMax(:,1) > dotSize & foundMax(:,1) < (imgHeight-dotSize) & foundMax(:,2) > dotSize & foundMax(:,2) < (imgWidth-dotSize));
 	foundMax = foundMax(index,:);
 end
 
@@ -117,7 +117,7 @@ if (foundPeaks > 1)
 	%map peaks
 	peakMap = 0.*image;
 	for (i = 1:foundPeaks)
-		peakMap(foundMax(i,1),foundMax(i,2)) = image(foundMax(i,1),foundMaxi,2));
+		peakMap(foundMax(i,1),foundMax(i,2)) = image(foundMax(i,1),foundMax(i,2));
 	end
 
 
@@ -127,13 +127,13 @@ if (foundPeaks > 1)
 
 		for (i = 1:foundPeaks)
 			%locMax of region of radius size/2
-			[maxRow, indexi] = max(peakMap((foundMax(i,1)-floor(size/2)):(foundMax(i,1)+(floor(size/2)+1)),(foundMax(i,2)-floor(size/2)):(foundMax(i,2)+(floor(size/2)+1))));
+			[maxRow, indexi] = max(peakMap((foundMax(i,1)-floor(dotSize/2)):(foundMax(i,1)+(floor(dotSize/2)+1)),(foundMax(i,2)-floor(dotSize/2)):(foundMax(i,2)+(floor(dotSize/2)+1))));
 			[maxVal, indexj] = max(maxRow);
 			%empty the region
-			peakMap((foundMax(i,1)-floor(size/2)):(foundMax(i,1)+(floor(size/2)+1)),(foundMax(i,2)-floor(size/2)):(foundMax(i,2)+(floor(size/2)+1)))=0;
+			peakMap((foundMax(i,1)-floor(dotSize/2)):(foundMax(i,1)+(floor(dotSize/2)+1)),(foundMax(i,2)-floor(dotSize/2)):(foundMax(i,2)+(floor(dotSize/2)+1)))=0;
 
 			%reinstate the highest
-			peakMap(foundMax(i,1)-floor(size/2)+indexi(indexj)-1,foundMax(i,2)-floor(size/2)+indexj-1)=maxVal;
+			peakMap(foundMax(i,1)-floor(dotSize/2)+indexi(indexj)-1,foundMax(i,2)-floor(dotSize/2)+indexj-1)=maxVal;
 		end
 
 		%get coordinates
@@ -148,7 +148,7 @@ if (foundPeaks > 1)
 	if (clump > 0)
 		%%remove the whole thing. Border around must be lower than bg + A*(Max-bg).
 		
-		borderSize = size + 2;
+		borderdSize = dotSize + 2;
 
 		%define border
 		for (i = 1:foundPeaks)
@@ -158,14 +158,16 @@ if (foundPeaks > 1)
 			for (i = (foundMax(i,1)-floor(borderSize/2)):(foundMax(i,1)+(floor(borderSize/2)+1)))
 				for (j = (foundMax(i,2)-floor(borderSize/2)):(foundMax(i,2)+(floor(borderSize/2)+1)))
 					%add indices
-					border = [border, (i,j)];
+					border(end+1,1) = i;
+					border(end+1,2) = j;
 				end
 			end
 
-			for (i = (foundMax(i,1)-floor(size/2)):(foundMax(i,1)+(floor(size/2)+1)))
-				for (j = (foundMax(i,2)-floor(size/2)):(foundMax(i,2)+(floor(size/2)+1)))
+			for (i = (foundMax(i,1)-floor(dotSize/2)):(foundMax(i,1)+(floor(dotSize/2)+1)))
+				for (j = (foundMax(i,2)-floor(dotSize/2)):(foundMax(i,2)+(floor(dotSize/2)+1)))
 					%remove indices
-					border = setdiff(border, [i,j]);
+					thisIndex = [i,j];
+					border = setdiff(border, thisIndex);
 				end
 			end
 
@@ -183,7 +185,7 @@ if (foundPeaks > 1)
 			borderThreshold = background + clump * (maxVal-background);
 
 			%% at least 1 pixel is above border threshold or negative
-			if (find((peakMap(border(:)) > borderThreshold)|(peakMap(border(:)) < 0) > 0)
+			if (find((peakMap(border(:)) > borderThreshold)) > 0)||(find ((peakMap(border(:)) < 0)) > 0)
 				%%make inner portion negative
 				peakMap(border(:)) = -1;
 			end

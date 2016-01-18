@@ -69,7 +69,7 @@ debugMode = 1;
 
 % bgMethod: Algorithm code for how the background is determined
 %
-% 0:	dafault: median + 3* SD = background
+% 0:	default: median +/- 3* SD = background and backgroundUpper
 % 1:	feedback: plots distribution and prompts for background value.
 % 2:	conservative fb: plots distribution and prompts for background and cutoff
 % 3:	legacy: 3 * second smallest from the projection
@@ -191,12 +191,14 @@ if (bgMethod == 0)
 	firstSTD = std(double(firstFrameData));
 	finalSTD = mean(firstSTD);
 
-	background = finalMedian + uint16(floor(3*(finalSTD)));
-
+	background = finalMedian - uint16(floor(3*(finalSTD)));
+	backgroundUpper = finalMedian + uint16(floor(3*(finalSTD)));
 
 	if (debugMode == 1)
 		formatSpec = '\n Background is set at: %d';
 		fprintf(formatSpec, background);
+		formatSpec = '\n Upperbound is set at: %d';
+		fprintf(formatSpec, backgroundUpper);
 	end
 
 end
@@ -360,9 +362,14 @@ if (qFindMethod == 0)
 		thisLayer = double(tiffReadStack(i).data);
 
 		qDotLayers = struct;
+		
+		if(bgmethod == 0)
+			thisData = pkfnd(thislayer, background, dotSize, backgroundUpper);
+		else 
+			%thisData = locMax(thisLayer, background, dotSize, clump);
+			thisData = pkfnd(thisLayer, background, dotSize);		
+		end
 
-		%thisData = locMax(thisLayer, background, dotSize, clump);
-		thisData = pkfnd(thisLayer, background, dotSize);
 
 		qDotLayers(i).data = thisData;
 	end
@@ -399,8 +406,12 @@ if (qFindMethod == 1)
 
 	%%% Find local maxima
 
-	%qDotLayer = locMax(maxProfile, background, dotSize, clump);
-	qDotLayer = pkfnd(maxProfile, background, dotSize);
+	if(bgmethod == 0)
+		thisData = pkfnd(thislayer, background, dotSize, backgroundUpper);
+	else 
+		%thisData = locMax(thisLayer, background, dotSize, clump);
+		thisData = pkfnd(thisLayer, background, dotSize);		
+	end
 
 end
 

@@ -1,4 +1,4 @@
-function out=pkfnd(im,th,sz)
+function out=pkfnd(im,th,sz,ub)
 %pkfnd:  finds local maxima in an image to pixel level accuracy.   
 %  this provides a rough guess of particle
 %  centers to be used by cntrd.m.  Inspired by the lmx subroutine of Grier
@@ -15,6 +15,7 @@ function out=pkfnd(im,th,sz)
 % maxima), then set this optional keyword to a value slightly larger than the diameter of your blob.  if
 % multiple peaks are found withing a radius of sz/2 then the code will keep
 % only the brightest.  Also gets rid of all peaks within sz of boundary
+% ub: OPTIONAL upperbound for the brightness of a pixel that might be a local maxima.
 %OUTPUT:  a N x 2 array containing, [row,column] coordinates of local maxima
 %           out(:,1) are the x-coordinates of the maxima
 %           out(:,2) are the y-coordinates of the maxima
@@ -27,12 +28,23 @@ function out=pkfnd(im,th,sz)
 % instead of row and column
 % ERD, 8/24/2005: pkfnd now exits politely if there's nothing above
 % threshold instead of crashing rudely
+% Jan. 2016 Editted to use uppderbound as well as threshold - regaldisclaimer
 
 
 
 %find all the pixels above threshold
 %im=im./max(max(im)); 
-ind=find(im > th);
+
+
+if(nargin==6)
+    %upperbound provided
+	indTemp = find(im > th);
+	ind = find(indTemp < ub);
+	
+else
+    ind = find(im > th);
+end
+
 [nr,nc]=size(im);
 tst=zeros(nr,nc);
 n=length(ind);

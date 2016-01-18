@@ -53,8 +53,10 @@ Edit the script, hardcode runtime options, and save the script so that your anal
 
 Here's a short description of the runtime options:
 
+````
  firstFrame: The frame # from which the analysis should start. First frame of the image stack is 1, not 0.
- 	If the first 10 frames cannot be trusted, for example, set this option as `firstFrame = 11`, so that the analysis starts on frame #11.
+ 	If the first 10 frames cannot be trusted, for example, set this option as `firstFrame = 11`, 
+ 	so that the analysis starts on frame #11.
 
  bgMethod: Algorithm code for how the background is determined
 
@@ -89,7 +91,7 @@ Here's a short description of the runtime options:
  0:	default. no debug messages
  1: 	comments will show to help you debug problems
 
-
+````
 
 ##Contact
 regaldisclaimer@gmail.com

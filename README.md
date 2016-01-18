@@ -56,38 +56,38 @@ Here's a short description of the runtime options:
  firstFrame: The frame # from which the analysis should start. First frame of the image stack is 1, not 0.
  	If the first 10 frames cannot be trusted, for example, set this option as `firstFrame = 11`, so that the analysis starts on frame #11.
 
-% bgMethod: Algorithm code for how the background is determined
-%
-% 0:	default: median +/- 3* SD = background and backgroundUpper. Uses both lower and upperbound.
-% 1:	feedback: plots distribution and prompts for background value.
-% 2:	conservative fb: plots distribution and prompts for background and cutoff
-% 3:	legacy: 3 * second smallest from the projection
+ bgMethod: Algorithm code for how the background is determined
 
-% qFindMethod: Method for finding qDots
-%
-% 0:	default. slower. iterates through every single frame for accuracy
-% 1:	legacy. faster. uses highest aggregate intensity
+ 0:	default: median +/- 3* SD = background and backgroundUpper. Uses both lower and upperbound.
+ 1:	feedback: plots distribution and prompts for background value.
+ 2:	conservative fb: plots distribution and prompts for background and cutoff
+ 3:	legacy: 3 * second smallest from the projection
 
+ qFindMethod: Method for finding qDots
 
-% dotSize: expected dotsize. regions larger than this will be considered as clumps.
-% 	Set slightly larger than suspected diameter
-%
-
-% clump: whether clumps are completely ignored, or treated as one qdot.
-%		
-% 1:	legacy. keep brightest pixel in clumps
-% 2:	don't check for clumps
-%
-% x:	default. ignore all points in clumps. checks border of size and makes sure
-%			that all points on the border is lower than background + x * (peak-background).
-%			x is allowance between 0 and 1.
-%			x will default to 0.25 if x = 0.
+ 0:	default. slower. iterates through every single frame for accuracy
+ 1:	legacy. faster. uses highest aggregate intensity
 
 
-% debugMode: turn debug comments on or off
-% 
-% 0:	default. no debug messages
-% 1: 	comments will show to help you debug problems
+ dotSize: expected dotsize. regions larger than this will be considered as clumps.
+ 	Set slightly larger than suspected diameter
+
+
+ clump: whether clumps are completely ignored, or treated as one qdot.
+		
+ 1:	legacy. keep brightest pixel in clumps
+ 2:	don't check for clumps
+
+ x:	default. ignore all points in clumps. checks border of size and makes sure
+			that all points on the border is lower than background + x * (peak-background).
+			x is allowance between 0 and 1.
+			x will default to 0.25 if x = 0.
+
+
+ debugMode: turn debug comments on or off
+ 
+ 0:	default. no debug messages
+ 1: 	comments will show to help you debug problems
 
 
 

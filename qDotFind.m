@@ -325,6 +325,8 @@ if (bgMethod ==3)
 		end
 	end
 
+	qDotLayer = maxProfile;
+
 	background = 3*min(setdiff(maxProfile(:),min(maxProfile(:))));
 
 	if (debugMode == 1)

@@ -479,13 +479,24 @@ while ~((thresResponse == 'Y')|| (thresResponse == 'y'))
 	imshow(firstFrameData, [min(firstFrameData(:)), eventThreshold])
 
 	%plot events
-	for q=1:size(qDotLayer,1)
-	    rectangle('Position', [qDotLayer(q,1)-0.5,qDotLayer(q,2)-0.5,1,1], ...
-	        'LineStyle', 'none', 'FaceColor', 'r')
+	if (qFindMethod == 0)
+		thisLayer = qDotLayers(1).data;
+		for q=1:size(thisLayer,1)
+		    rectangle('Position', [thisLayer(q,1)-0.5,thisLayer(q,2)-0.5,1,1], ...
+		        'LineStyle', 'none', 'FaceColor', 'r')
+		end
+	
+		thresResponse = input('\n Are you happy with the event threshold? [Y/N]');		
+	
+	if (qFindMethod == 1)
+		for q=1:size(qDotLayer,1)
+		    rectangle('Position', [qDotLayer(q,1)-0.5,qDotLayer(q,2)-0.5,1,1], ...
+		        'LineStyle', 'none', 'FaceColor', 'r')
+		end
+	
+		thresResponse = input('\n Are you happy with the event threshold? [Y/N]');
 	end
-
-	thresResponse = input('\n Are you happy with the event threshold? [Y/N]');
-
+	
 end
 
 formatSpec = '\n Great. Event Threshold set @ %d';
